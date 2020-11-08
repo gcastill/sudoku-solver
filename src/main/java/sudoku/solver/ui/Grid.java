@@ -1,4 +1,4 @@
-package sudoku.solver;
+package sudoku.solver.ui;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;

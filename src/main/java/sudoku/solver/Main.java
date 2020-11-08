@@ -1,5 +1,7 @@
 package sudoku.solver;
 
+import sudoku.solver.ui.Grid;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
