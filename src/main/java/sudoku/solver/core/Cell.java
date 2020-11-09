@@ -1,11 +1,17 @@
 package sudoku.solver.core;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class Cell {
 
     private final Coordinate gridCoordinate;
-    private final Coordinate boxCoordinate;
-    private int value;
+    @Getter
+    private Integer value;
+
+
+    public void setValue(Integer value){
+
+    }
 }
