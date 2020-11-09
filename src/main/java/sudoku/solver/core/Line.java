@@ -11,7 +11,11 @@ public class Line {
     private final LineAddress address;
     private final Map<Integer, Cell> cells = new HashMap<>();
 
-    public Cell get(Integer index){
+    public Cell get(Integer index) {
         return cells.get(index);
+    }
+
+    Cell put(Integer index, Cell cell) {
+        return cells.put(index, cell);
     }
 }
