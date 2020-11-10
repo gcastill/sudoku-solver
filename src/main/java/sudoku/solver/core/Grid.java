@@ -2,6 +2,7 @@ package sudoku.solver.core;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -59,8 +60,8 @@ public class Grid {
 
     public Box getBox(Cell cell) {
         Coordinate coordinate = cell.getCoordinate();
-        int boxX = (coordinate.getX() / 3) ;
-        int boxY = (coordinate.getY() / 3) ;
+        int boxX = (coordinate.getX() / 3);
+        int boxY = (coordinate.getY() / 3);
         return boxes.get(new Coordinate(boxX, boxY));
     }
 
@@ -83,8 +84,13 @@ public class Grid {
     public Cell getCell(Coordinate coordinate) {
         return cells.get(coordinate);
     }
-    public Cell getCell(int x, int y){
-        return getCell(new Coordinate(x,y));
+
+    public Cell getCell(int x, int y) {
+        return getCell(new Coordinate(x, y));
+    }
+
+    public void setValue(int x, int y, int value) {
+        getCell(x, y).setValue(value);
     }
 
     public Optional<Line> getNextLine(LineAddress address) {
@@ -94,6 +100,7 @@ public class Grid {
     public Optional<Box> getNextBox(Coordinate coordinate, Direction direction) {
         return Optional.ofNullable(boxes.get(direction.getNext(coordinate)));
     }
+
 
     public Optional<Box> getNextBox(Box box, Direction direction) {
         return getNextBox(box.getCoordinate(), direction);
@@ -115,4 +122,24 @@ public class Grid {
     }
 
 
+    public  Stream<Cell> cellStream() {
+
+        int start = 0;
+        int end = 9;
+
+        return IntStream
+                .range(start, end)
+                .map(i -> start + (end - 1 - i))
+                .mapToObj(y ->
+                    IntStream
+                            .range(start, end)
+                            .mapToObj(x -> new Coordinate(x, y))
+                            .map(cells::get)
+                ).flatMap(Function.identity());
+
+    }
+
+    public boolean isComplete(){
+     return   cellStream().map(Cell::getValue).filter(Objects::nonNull).count() == 81L;
+    }
 }
