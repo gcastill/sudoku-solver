@@ -2,10 +2,12 @@ package sudoku.solver.core;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import sudoku.solver.util.CsvLoader;
 import sudoku.solver.util.PrettyPrint;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 class SolverTest {
 
@@ -68,11 +70,8 @@ class SolverTest {
                 .
                         filter(cell -> Objects.isNull(cell.getValue()))
                 .forEach(cell ->
-                        System.out.printf("x=%s, y=%s, options=%s\n", cell
-                                .getCoordinate()
-                                .getX(), cell
-                                .getCoordinate()
-                                .getY(), Solver.calculateOptions(cell, g))
+                        System.out.printf("%s, options=%s\n", PrettyPrint.toString(cell.getCoordinate()), Solver.calculateOptions(cell,
+                                g))
 
                 );
     }
@@ -80,19 +79,88 @@ class SolverTest {
 
     @Test
     void testSolve() {
+
+    }
+
+    @Test
+    void testSolve20191307Hard() {
+        Grid g = CsvLoader.load("csv/20191307-hard.csv");
+        testSolve(g);
+    }
+
+    public void testSolve(Grid g) {
         List<Iteration> iterations = Solver.solve(g);
         for (Iteration i : iterations) {
             System.out.println(PrettyPrint.toString(i.getGrid()));
             i
                     .getCoordinateOptions()
                     .entrySet()
-                    .forEach(e -> System.out.printf("x=%s, y=%s, options=%s\n", e
-                            .getKey()
-                            .getX(), e
-                            .getKey()
-                            .getY(), e.getValue()));
+                    .stream()
+                    .filter(e -> e
+                            .getValue()
+                            .size() == 1)
+                    .forEach(e -> System.out.printf("%s, options=%s\n", PrettyPrint.toString(e
+                            .getKey()), e.getValue()));
             System.out.println();
-        }
-    }
 
+
+            i
+                    .getBoxOptions()
+                    .entrySet()
+                    .forEach(e ->
+                            {
+                                System.out.printf("%s\n", PrettyPrint.toString(e.getKey()));
+                                e
+                                        .getValue()
+                                        .getOptions()
+                                        .entrySet()
+                                        .stream()
+                                        .filter(entry -> entry
+                                                .getValue()
+                                                .size() == 1)
+                                        .forEach(entry -> System.out.printf("value=%s, options=%s\n", entry.getKey(),
+                                                entry
+                                                        .getValue()
+                                                        .stream()
+                                                        .map(PrettyPrint::toString)
+                                                        .collect(Collectors.toList())));
+                            }
+                    );
+            System.out.println();
+
+            i
+                    .getLineOptions()
+                    .entrySet()
+                    .forEach(e ->
+                            {
+                                System.out.printf("(%s,%s)\n", e
+                                        .getKey()
+                                        .getOrientation(), e
+                                        .getKey()
+                                        .getIndex());
+                                e
+                                        .getValue()
+                                        .getOptions()
+                                        .entrySet()
+                                        .stream()
+                                        .filter(entry -> entry
+                                                .getValue()
+                                                .size() == 1)
+                                        .forEach(entry -> System.out.printf("value=%s, options=%s\n", entry.getKey(),
+                                                entry
+                                                        .getValue()
+                                                        .stream()
+                                                        .map(PrettyPrint::toString)
+                                                        .collect(Collectors.toList())));
+                            }
+                    );
+            System.out.println();
+
+
+        }
+        System.out.printf("finished after %s iterations, isComplete= %s\n", iterations.size(),
+                iterations
+                        .get(iterations.size() - 1)
+                        .isComplete());
+    }
 }

@@ -1,5 +1,6 @@
 package sudoku.solver.util;
 
+import sudoku.solver.core.Coordinate;
 import sudoku.solver.core.Grid;
 
 import java.util.Optional;
@@ -32,8 +33,12 @@ public class PrettyPrint {
                     }
 
                 })
-                ;
+        ;
         return sb.toString();
+    }
+
+    public static String toString(Coordinate coordinate) {
+        return "(" + coordinate.getX() +","+ coordinate.getY() + ")";
     }
 
 }

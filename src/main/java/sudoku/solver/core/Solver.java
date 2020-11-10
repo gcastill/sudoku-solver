@@ -19,6 +19,9 @@ public class Solver {
         while (!last.isComplete()) {
             last.analyze();
             Iteration next = last.next();
+            if (next == null) {
+                break;
+            }
             iterations.add(next);
             last = next;
         }

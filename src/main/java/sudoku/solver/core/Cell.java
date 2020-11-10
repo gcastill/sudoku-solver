@@ -15,4 +15,11 @@ public class Cell {
     public void setValue(Integer value) {
         this.value = value;
     }
+
+    public boolean isComplete() {
+        return value != null;
+    }
+    public boolean requiresSolving() {
+        return !isComplete();
+    }
 }

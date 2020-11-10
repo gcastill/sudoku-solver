@@ -12,8 +12,8 @@ public interface CellSupport {
     default SortedSet<Integer> getCellValues() {
         return getCellCollection()
                 .stream()
+                .filter(Cell::isComplete)
                 .map(Cell::getValue)
-                .filter(Objects::nonNull)
                 .collect(Collectors.toCollection(TreeSet::new));
     }
 
@@ -22,6 +22,15 @@ public interface CellSupport {
         return IntStream
                 .range(1,10).boxed().filter(v-> !cellValues.contains(v))
                 .collect(Collectors.toCollection(TreeSet::new));
+    }
+
+
+    default boolean isComplete() {
+        return getMissingCellValues().isEmpty();
+    }
+
+    default boolean requiresSolving() {
+        return !isComplete();
     }
 
 }

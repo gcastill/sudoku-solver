@@ -5,12 +5,13 @@ import lombok.Value;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 @Value
 public class Box implements CellSupport {
 
     private final Coordinate coordinate;
-    private final Map<Coordinate, Cell> cells = new HashMap<>();
+    private final Map<Coordinate, Cell> cells = new TreeMap<>();
 
     public Cell getCell(Coordinate coordinate) {
         return cells.get(coordinate);
@@ -25,4 +26,6 @@ public class Box implements CellSupport {
     public Collection<Cell> getCellCollection() {
         return cells.values();
     }
+
+
 }

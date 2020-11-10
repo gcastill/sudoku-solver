@@ -1,9 +1,6 @@
 package sudoku.solver.core;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -38,7 +35,7 @@ public class Grid {
                 .flatMap(List::stream)
                 .collect(Collectors.toUnmodifiableMap(Function.identity(), Box::new));
 
-        this.cells = IntStream
+        this.cells = Collections.unmodifiableMap(new TreeMap<>(IntStream
                 .range(0, 9)
                 .mapToObj(x -> IntStream
                         .range(0, 9)
@@ -53,7 +50,7 @@ public class Grid {
                         .getCoordinate()
                         .getX(), cell))
                 .peek(cell -> getBox(cell).put(cell))
-                .collect(Collectors.toUnmodifiableMap(Cell::getCoordinate, Function.identity()));
+                .collect(Collectors.toMap(Cell::getCoordinate, Function.identity()))));
 
 
     }
@@ -93,6 +90,10 @@ public class Grid {
         getCell(x, y).setValue(value);
     }
 
+    public void setValue(Coordinate coordinate, int value) {
+        getCell(coordinate).setValue(value);
+    }
+
     public Optional<Line> getNextLine(LineAddress address) {
         return Optional.ofNullable(lines.get(address));
     }
@@ -122,24 +123,29 @@ public class Grid {
     }
 
 
-    public  Stream<Cell> cellStream() {
+    public Stream<Cell> cellStream() {
+        return cells
+                .values()
+                .stream();
 
-        int start = 0;
-        int end = 9;
-
-        return IntStream
-                .range(start, end)
-                .map(i -> start + (end - 1 - i))
-                .mapToObj(y ->
-                    IntStream
-                            .range(start, end)
-                            .mapToObj(x -> new Coordinate(x, y))
-                            .map(cells::get)
-                ).flatMap(Function.identity());
 
     }
 
-    public boolean isComplete(){
-     return   cellStream().map(Cell::getValue).filter(Objects::nonNull).count() == 81L;
+    public Stream<Box> boxStream() {
+        return boxes
+                .values()
+                .stream();
+    }
+
+    public Stream<Line> lineStream() {
+        return lines
+                .values()
+                .stream();
+    }
+
+    public boolean isComplete() {
+        return cellStream()
+                .allMatch(Cell::isComplete)
+                ;
     }
 }
