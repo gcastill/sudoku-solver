@@ -28,7 +28,6 @@ public class Iteration {
                         .getValue()
                         .size() == 1)
                 .peek(e -> {
-
                     Coordinate coordinate = e.getKey();
                     clone.setValue(coordinate.getX(), coordinate.getY(), e
                             .getValue()
@@ -65,9 +64,9 @@ public class Iteration {
         grid
                 .boxStream()
                 .filter(Box::requiresSolving)
-                .map(box -> new Options<Coordinate>(box.getCoordinate(), box, grid))
+                .map(box -> new Options<Coordinate>(box.getCoordinate(), box))
                 .forEach(o -> {
-                    o.analyze();
+                    o.analyze(this);
                     boxOptions.put(o.getId()
                             , o);
 
@@ -75,11 +74,14 @@ public class Iteration {
         grid
                 .lineStream()
                 .filter(Line::requiresSolving)
-                .map(line -> new Options<LineAddress>(line.getAddress(), line, grid))
+                .map(line -> new Options<LineAddress>(line.getAddress(), line))
                 .forEach(o -> {
-                    o.analyze();
+                    o.analyze(this);
                     lineOptions.put(o.getId(), o);
                 });
+
+
+
     }
 
     public boolean isComplete() {
@@ -90,19 +92,18 @@ public class Iteration {
     public static class Options<T> {
         private final T id;
         private final CellSupport cellSupport;
-        private final Grid grid;
         private final SortedMap<Integer, SortedSet<Coordinate>> options = new TreeMap<>();
 
 
-        public void analyze() {
+        public void analyze(Iteration iteration) {
 
             cellSupport
                     .getCellCollection()
                     .stream()
                     .filter(Cell::requiresSolving)
                     .forEach(cell -> {
-                        Solver
-                                .calculateOptions(cell, grid)
+                        iteration.coordinateOptions
+                                .get(cell.getCoordinate())
                                 .forEach(option -> {
                                     options
                                             .computeIfAbsent(option,
@@ -134,7 +135,6 @@ public class Iteration {
 
 
     }
-
 
 
 }

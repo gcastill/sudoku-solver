@@ -88,7 +88,15 @@ class SolverTest {
         testSolve(g);
     }
 
+    @Test
+    void testSolve20191507Evil() {
+        Grid g = CsvLoader.load("csv/20191507-evil.csv");
+        testSolve(g);
+    }
+
+
     public void testSolve(Grid g) {
+
         List<Iteration> iterations = Solver.solve(g);
         for (Iteration i : iterations) {
             System.out.println(PrettyPrint.toString(i.getGrid()));
@@ -96,9 +104,9 @@ class SolverTest {
                     .getCoordinateOptions()
                     .entrySet()
                     .stream()
-                    .filter(e -> e
-                            .getValue()
-                            .size() == 1)
+//                    .filter(e -> e
+//                            .getValue()
+//                            .size() == 1)
                     .forEach(e -> System.out.printf("%s, options=%s\n", PrettyPrint.toString(e
                             .getKey()), e.getValue()));
             System.out.println();
@@ -115,9 +123,9 @@ class SolverTest {
                                         .getOptions()
                                         .entrySet()
                                         .stream()
-                                        .filter(entry -> entry
-                                                .getValue()
-                                                .size() == 1)
+//                                        .filter(entry -> entry
+//                                                .getValue()
+//                                                .size() == 1)
                                         .forEach(entry -> System.out.printf("value=%s, options=%s\n", entry.getKey(),
                                                 entry
                                                         .getValue()
@@ -143,9 +151,9 @@ class SolverTest {
                                         .getOptions()
                                         .entrySet()
                                         .stream()
-                                        .filter(entry -> entry
-                                                .getValue()
-                                                .size() == 1)
+//                                        .filter(entry -> entry
+//                                                .getValue()
+//                                                .size() == 1)
                                         .forEach(entry -> System.out.printf("value=%s, options=%s\n", entry.getKey(),
                                                 entry
                                                         .getValue()

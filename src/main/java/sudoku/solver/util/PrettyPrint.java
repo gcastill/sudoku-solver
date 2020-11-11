@@ -14,6 +14,14 @@ public class PrettyPrint {
         grid
                 .cellStream()
                 .forEach(cell -> {
+                    if (cell
+                            .getCoordinate()
+                            .equals(new Coordinate(0, 5)) || cell
+                            .getCoordinate()
+                            .equals(new Coordinate(0
+                                    , 2))) {
+                        sb.append("------+-----+------\n");
+                    }
 
                     if (cell
                             .getCoordinate()
@@ -32,13 +40,14 @@ public class PrettyPrint {
                         sb.append("\n");
                     }
 
+
                 })
         ;
         return sb.toString();
     }
 
     public static String toString(Coordinate coordinate) {
-        return "(" + coordinate.getX() +","+ coordinate.getY() + ")";
+        return "(" + coordinate.getX() + "," + coordinate.getY() + ")";
     }
 
 }
