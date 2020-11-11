@@ -1,6 +1,7 @@
 package sudoku.solver.core;
 
 import lombok.Value;
+import sudoku.solver.core.rule.NakedSets;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -79,7 +80,7 @@ public class Iteration {
                     o.analyze(this);
                     lineOptions.put(o.getId(), o);
                 });
-
+        NakedSets.analyze(this);
 
 
     }
