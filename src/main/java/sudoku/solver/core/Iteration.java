@@ -87,7 +87,7 @@ public class Iteration {
                 });
 
         long updateCount = -1;
-        while (updateCount != -1) {
+        while (updateCount != 0) {
             long hiddenSetsCount = HiddenSets.analyze(this);
             long omissionCount = Omission.analyze(this);
             long xWingCount = XWing.analyze(this);
@@ -121,7 +121,6 @@ public class Iteration {
                 .getOptions()
                 .get(value)
                 .remove(coordinate);
-
 
         LOG.debug("round {} deleting option: location={}, option={}", round, PrettyPrint.toString(coordinate),
                 value);

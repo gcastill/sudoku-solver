@@ -67,17 +67,21 @@ public class Grid {
     }
 
     public Line getHorizontalLine(Coordinate coordinate) {
-        return lines.get(new LineAddress(coordinate
-                .getY(), Orientation.HORIZONTAL));
+        return getLine(coordinate,Orientation.HORIZONTAL);
+    }
+
+    public Line getLine(Coordinate coordinate, Orientation orientation) {
+        return lines.get(orientation.lineAddressFor(coordinate));
     }
 
     public Line getVerticalLine(Cell cell) {
         return getVerticalLine(cell.getCoordinate());
     }
+
     public Line getVerticalLine(Coordinate coordinate) {
-        return lines.get(new LineAddress(coordinate
-                .getX(), Orientation.VERTICAL));
+        return getLine(coordinate,Orientation.VERTICAL);
     }
+
     public Optional<Line> getNextLine(byte index, Orientation orientation) {
         return getNextLine(new LineAddress(index, orientation));
     }
