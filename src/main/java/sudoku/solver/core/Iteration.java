@@ -3,7 +3,7 @@ package sudoku.solver.core;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
-import sudoku.solver.core.rule.NakedSets;
+import sudoku.solver.core.rule.HiddenSets;
 import sudoku.solver.core.rule.Omission;
 import sudoku.solver.util.PrettyPrint;
 
@@ -83,7 +83,7 @@ public class Iteration {
                     o.analyze(this);
                     lineOptions.put(o.getId(), o);
                 });
-        NakedSets.analyze(this);
+        HiddenSets.analyze(this);
         Omission.analyze(this);
 
     }

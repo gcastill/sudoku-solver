@@ -1,70 +1,87 @@
 package sudoku.solver.core.rule;
 
-import com.google.common.collect.ImmutableSet;
-import lombok.Builder;
-import lombok.Singular;
-import lombok.Value;
+import sudoku.solver.core.Coordinate;
+import sudoku.solver.core.Iteration;
 
-import javax.annotation.concurrent.Immutable;
-import java.util.Collections;
-import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collector;
+import java.util.SortedSet;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class HiddenSets {
 
 
-    public static Set<Set<Integer>> generate(Set<Integer> values, int size) {
-        if (size > values.size()) {
-            return Collections.emptySet();
-        }
-        return generate(State
-                .builder()
-                .selection(new HashSet<>(values))
-                .targetSize(size)
-                .build())
-                .map(State::getResults)
-                .collect(Collectors.toSet());
+    public static void analyze(Iteration iteration) {
+        for (Iteration.Options<?> options : iteration
+                .getLineOptions()
+                .values()) {
+            analyze(2, iteration, options);
+            analyze(3, iteration, options);
+            analyze(4, iteration, options);
 
+        }
+
+        for (Iteration.Options<?> options : iteration
+                .getBoxOptions()
+                .values()) {
+            analyze(2, iteration, options);
+            analyze(3, iteration, options);
+            analyze(4, iteration, options);
+
+        }
     }
 
-
-    private static Stream<State> generate(State state) {
-
-        if (state.results.size() == state.getTargetSize()) {
-            return Stream.of(state);
-        }
-
-        return state
-                .getSelection()
+    public static void analyze(int size, Iteration iteration, Iteration.Options<?> options) {
+        Map<SortedSet<Coordinate>, Set<Integer>> items = options
+                .getOptions()
+                .entrySet()
                 .stream()
-                .map(item -> state
-                        .toBuilder()
-                        .selection(cloneAndRemove(state.getSelection(),
-                                item))
-                        .result(item)
-                        .build())
-                .flatMap(HiddenSets::generate);
+                .filter((e -> e
+                        .getValue()
+                        .size() == size))
+                .collect(Collectors.groupingBy(e -> e.getValue()))
+                .entrySet()
+                .stream()
+                .filter(e -> e
+                        .getValue()
+                        .size() == size)
+                .collect(Collectors.toMap(e -> e.getKey(), e -> e
+                        .getValue()
+                        .stream()
+                        .map(entry -> entry.getKey())
+                        .collect(Collectors.toSet())));
 
+        if(!items.isEmpty()){
+            System.out.println();
+        }
+        items.forEach((nakedPairCoordinates, nakedPairOptions) -> {
+            options
+                    .getOptions()
+                    .entrySet()
+                    .forEach(e -> {
+                        Set<Coordinate> toDelete;
+                        if (nakedPairOptions.contains(e.getKey())) {
+                            toDelete = e
+                                    .getValue()
+                                    .stream()
+                                    .filter(coordinate -> !nakedPairCoordinates.contains(coordinate))
+                                    .collect(Collectors.toSet());
+
+                        } else {
+                            toDelete = e
+                                    .getValue()
+                                    .stream()
+                                    .filter(coordinate -> nakedPairCoordinates.contains(coordinate))
+                                    .collect(Collectors.toSet());
+
+
+                        }
+                        toDelete.forEach(c -> iteration.removeOption(c, e.getKey()));
+                    });
+        });
 
     }
-
-
-     public static <T> Set<T> cloneAndRemove(Set<T> set, T item) {
-        Set<T> result = new HashSet<>(set);
-        result.remove(item);
-        return result;
-    }
-
-    @Value
-    @Builder(toBuilder = true)
-    public static class State {
-        private final @Singular
-        Set<Integer> results;
-        private final Set<Integer> selection;
-        private final int targetSize;
-    }
-
 }
+
+
