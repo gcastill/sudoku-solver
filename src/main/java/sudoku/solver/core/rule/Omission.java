@@ -9,41 +9,54 @@ import java.util.stream.Collectors;
 
 public class Omission {
 
-    public static void analyze(Iteration iteration) {
-        iteration
+    public static long analyze(Iteration iteration) {
+        long updates = 0;
+        updates += iteration
                 .getLineOptions()
                 .values()
-                .forEach(options -> analyzeLineOption(iteration, options));
+                .stream()
+                .mapToLong(options -> analyzeLineOption(iteration, options))
+                .sum();
 
-        iteration
+        updates += iteration
                 .getBoxOptions()
                 .values()
-                .forEach(options -> analyzeBoxOption(iteration, options));
+                .stream()
+                .mapToLong(options -> analyzeBoxOption(iteration, options))
+                .sum();
 
-
+        return updates;
     }
 
-    public static void analyzeBoxOption(Iteration iteration, Iteration.Options<Coordinate> options) {
-        options
+    public static long analyzeBoxOption(Iteration iteration, Iteration.Options<Coordinate> options) {
+        return options
                 .getOptions()
-                .forEach((k, v) -> {
-                    analyzeBoxOption(iteration, options, k, v, c -> iteration
+                .entrySet()
+                .stream()
+                .mapToLong(e -> {
+                    int updates = 0;
+                    updates += analyzeBoxOption(iteration, options, e.getKey(), e.getValue(), c -> iteration
                             .getGrid()
                             .getHorizontalLine(c));
-                    analyzeBoxOption(iteration, options, k, v, c -> iteration
+                    updates += analyzeBoxOption(iteration, options, e.getKey(), e.getValue(), c -> iteration
                             .getGrid()
                             .getVerticalLine(c));
-                });
+                    return updates;
+                })
+                .sum();
     }
 
-    public static void analyzeLineOption(Iteration iteration, Iteration.Options<LineAddress> options) {
-        options
+    public static long analyzeLineOption(Iteration iteration, Iteration.Options<LineAddress> options) {
+        return options
                 .getOptions()
-                .forEach((k, v) -> analyzeLineOption(iteration, options, k, v));
+                .entrySet()
+                .stream()
+                .mapToLong(e -> analyzeLineOption(iteration, options, e.getKey(), e.getValue()))
+                .sum();
     }
 
 
-    public static void analyzeBoxOption(Iteration iteration, Iteration.Options<Coordinate> options, Integer option,
+    public static long analyzeBoxOption(Iteration iteration, Iteration.Options<Coordinate> options, Integer option,
                                         SortedSet<Coordinate> coordinates, Function<Coordinate, Line> lineLookup) {
 
         Set<Line> lines = coordinates
@@ -60,7 +73,7 @@ public class Omission {
             Iteration.Options<LineAddress> coordinateOptions = iteration
                     .getLineOptions()
                     .get(line.getAddress());
-            line
+            return line
                     .getCellCollection()
                     .stream()
                     .filter(Cell::requiresSolving)
@@ -70,12 +83,14 @@ public class Omission {
                             .getOptions()
                             .get(option)
                             .contains(coordinate))
-                    .forEach(coordinate -> iteration.removeOption(coordinate, option));
+                    .peek(coordinate -> iteration.removeOption(coordinate, option))
+                    .count();
         }
+        return 0;
     }
 
 
-    public static void analyzeLineOption(Iteration iteration, Iteration.Options<LineAddress> options, Integer option,
+    public static long analyzeLineOption(Iteration iteration, Iteration.Options<LineAddress> options, Integer option,
                                          SortedSet<Coordinate> coordinates) {
         Grid grid = iteration.getGrid();
         Set<Box> boxes = coordinates
@@ -91,7 +106,7 @@ public class Omission {
             Iteration.Options<Coordinate> coordinateOptions = iteration
                     .getBoxOptions()
                     .get(box.getCoordinate());
-            box
+            return box
                     .getCellCollection()
                     .stream()
                     .filter(Cell::requiresSolving)
@@ -101,7 +116,10 @@ public class Omission {
                             .getOptions()
                             .get(option)
                             .contains(coordinate))
-                    .forEach(coordinate -> iteration.removeOption(coordinate, option));
+                    .peek(coordinate -> iteration.removeOption(coordinate, option))
+                    .count();
         }
+        return 0;
+
     }
 }

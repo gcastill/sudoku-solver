@@ -5,11 +5,13 @@ import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import sudoku.solver.core.rule.HiddenSets;
 import sudoku.solver.core.rule.Omission;
+import sudoku.solver.core.rule.XWing;
 import sudoku.solver.util.PrettyPrint;
 
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 @Slf4j
 @RequiredArgsConstructor
 @Value
@@ -83,8 +85,17 @@ public class Iteration {
                     o.analyze(this);
                     lineOptions.put(o.getId(), o);
                 });
-        HiddenSets.analyze(this);
-        Omission.analyze(this);
+
+        long updateCount = -1;
+        while (updateCount != -1) {
+            long hiddenSetsCount = HiddenSets.analyze(this);
+            long omissionCount = Omission.analyze(this);
+            long xWingCount = XWing.analyze(this);
+
+            updateCount = hiddenSetsCount + omissionCount + xWingCount;
+            LOG.debug("hiddenSetsCount={}, omissionCount={}, xWingCount={}", hiddenSetsCount, omissionCount, xWingCount);
+        }
+
 
     }
 
@@ -123,13 +134,13 @@ public class Iteration {
     @Value
     public static class Options<T> {
         private final T id;
-        private final CellSupport cellSupport;
+        private final House house;
         private final SortedMap<Integer, SortedSet<Coordinate>> options = new TreeMap<>();
 
 
         public void analyze(Iteration iteration) {
 
-            cellSupport
+            house
                     .getCellCollection()
                     .stream()
                     .filter(Cell::requiresSolving)

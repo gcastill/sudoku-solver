@@ -4,7 +4,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public interface CellSupport {
+public interface House {
 
     Collection<Cell> getCellCollection();
 
@@ -20,7 +20,9 @@ public interface CellSupport {
     default SortedSet<Integer> getMissingCellValues() {
         SortedSet<Integer> cellValues = getCellValues();
         return IntStream
-                .range(1,10).boxed().filter(v-> !cellValues.contains(v))
+                .range(1, 10)
+                .boxed()
+                .filter(v -> !cellValues.contains(v))
                 .collect(Collectors.toCollection(TreeSet::new));
     }
 

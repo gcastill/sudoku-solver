@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Value
-public class Line implements CellSupport {
+public class Line implements House {
 
     private final LineAddress address;
     private final Map<Integer, Cell> cells = new HashMap<>();
@@ -22,6 +22,12 @@ public class Line implements CellSupport {
 
     public Collection<Cell> getCellCollection() {
         return cells.values();
+    }
+
+    public boolean isOriented(Orientation orientation) {
+        return address
+                .getOrientation()
+                .equals(orientation);
     }
 }
 

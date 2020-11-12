@@ -3,12 +3,11 @@ package sudoku.solver.core;
 import lombok.Value;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
 @Value
-public class Box implements CellSupport {
+public class Box implements House {
 
     private final Coordinate coordinate;
     private final Map<Coordinate, Cell> cells = new TreeMap<>();
