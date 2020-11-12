@@ -3,6 +3,7 @@ package sudoku.solver.core.rule;
 import sudoku.solver.core.Coordinate;
 import sudoku.solver.core.Iteration;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
@@ -15,23 +16,23 @@ public class NakedSets {
         for (Iteration.Options<?> options : iteration
                 .getLineOptions()
                 .values()) {
-            analyze(2, options);
-            analyze(3, options);
-            analyze(4, options);
+            analyze(2, iteration, options);
+            analyze(3, iteration, options);
+            analyze(4, iteration, options);
 
         }
 
         for (Iteration.Options<?> options : iteration
                 .getBoxOptions()
                 .values()) {
-            analyze(2, options);
-            analyze(3, options);
-            analyze(4, options);
+            analyze(2, iteration, options);
+            analyze(3, iteration, options);
+            analyze(4, iteration, options);
 
         }
     }
 
-    public static void analyze(int size, Iteration.Options<?> options) {
+    public static void analyze(int size, Iteration iteration, Iteration.Options<?> options) {
         Map<SortedSet<Coordinate>, Set<Integer>> items = options
                 .getOptions()
                 .entrySet()
@@ -56,15 +57,24 @@ public class NakedSets {
                     .getOptions()
                     .entrySet()
                     .forEach(e -> {
+                        Set<Coordinate> toDelete;
                         if (nakedPairOptions.contains(e.getKey())) {
-                            e
+                            toDelete = e
                                     .getValue()
-                                    .retainAll(nakedPairCoordinates);
+                                    .stream()
+                                    .filter(coordinate -> !nakedPairCoordinates.contains(coordinate))
+                                    .collect(Collectors.toSet());
+
                         } else {
-                            e
+                            toDelete = e
                                     .getValue()
-                                    .removeAll(nakedPairCoordinates);
+                                    .stream()
+                                    .filter(coordinate -> nakedPairCoordinates.contains(coordinate))
+                                    .collect(Collectors.toSet());
+
+
                         }
+                        toDelete.forEach(c -> iteration.removeOption(c, e.getKey()));
                     });
         });
 

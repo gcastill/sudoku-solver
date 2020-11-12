@@ -117,7 +117,8 @@ class SolverTest {
                     .entrySet()
                     .forEach(e ->
                             {
-                                System.out.printf("%s\n", PrettyPrint.toString(e.getKey()));
+                                String header =
+                                String.format("Box%s", PrettyPrint.toString(e.getKey()));
                                 e
                                         .getValue()
                                         .getOptions()
@@ -126,7 +127,9 @@ class SolverTest {
 //                                        .filter(entry -> entry
 //                                                .getValue()
 //                                                .size() == 1)
-                                        .forEach(entry -> System.out.printf("value=%s, options=%s\n", entry.getKey(),
+                                        .forEach(entry -> System.out.printf("%s, value=%s, options=%s\n",
+                                                header,
+                                                entry.getKey(),
                                                 entry
                                                         .getValue()
                                                         .stream()
@@ -141,7 +144,8 @@ class SolverTest {
                     .entrySet()
                     .forEach(e ->
                             {
-                                System.out.printf("(%s,%s)\n", e
+                                String header =
+                                String.format("Line(%s,%s)", e
                                         .getKey()
                                         .getOrientation(), e
                                         .getKey()
@@ -154,7 +158,9 @@ class SolverTest {
 //                                        .filter(entry -> entry
 //                                                .getValue()
 //                                                .size() == 1)
-                                        .forEach(entry -> System.out.printf("value=%s, options=%s\n", entry.getKey(),
+                                        .forEach(entry -> System.out.printf("%s, value=%s, options=%s\n",
+                                                header,
+                                                entry.getKey(),
                                                 entry
                                                         .getValue()
                                                         .stream()

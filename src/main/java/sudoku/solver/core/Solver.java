@@ -14,7 +14,7 @@ public class Solver {
 
 
         List<Iteration> iterations = new ArrayList<>();
-        Iteration last = new Iteration(grid);
+        Iteration last = new Iteration(0,grid);
         iterations.add(last);
         while (!last.isComplete()) {
             last.analyze();

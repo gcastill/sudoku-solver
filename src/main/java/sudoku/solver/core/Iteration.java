@@ -1,23 +1,26 @@
 package sudoku.solver.core;
 
+import lombok.RequiredArgsConstructor;
 import lombok.Value;
+import lombok.extern.slf4j.Slf4j;
 import sudoku.solver.core.rule.NakedSets;
+import sudoku.solver.core.rule.Omission;
+import sudoku.solver.util.PrettyPrint;
 
 import java.util.*;
 import java.util.stream.Collectors;
-
+import java.util.stream.Stream;
+@Slf4j
+@RequiredArgsConstructor
 @Value
 public class Iteration {
 
+    private final int round;
     private final Grid grid;
     private final SortedMap<Coordinate, SortedSet<Integer>> coordinateOptions = new TreeMap<>();
     private final SortedMap<Coordinate, Options<Coordinate>> boxOptions = new TreeMap<>();
     private final SortedMap<LineAddress, Options<LineAddress>> lineOptions = new TreeMap<>();
 
-    public Iteration(Grid grid) {
-        this.grid = grid;
-
-    }
 
     public Iteration next() {
         Grid clone = grid.clone();
@@ -53,7 +56,7 @@ public class Iteration {
         if (updateCount == 0) {
             return null;
         }
-        return new Iteration(clone);
+        return new Iteration(round + 1, clone);
     }
 
     public void analyze() {
@@ -81,8 +84,36 @@ public class Iteration {
                     lineOptions.put(o.getId(), o);
                 });
         NakedSets.analyze(this);
+        Omission.analyze(this);
+
+    }
+
+    public void removeOption(Coordinate coordinate, int value) {
+        coordinateOptions
+                .get(coordinate)
+                .remove(value);
+
+        Stream
+                .of(grid
+                        .getHorizontalLine(coordinate), grid
+                        .getVerticalLine(coordinate))
+                .map(Line::getAddress)
+                .map(lineOptions::get)
+                .map(Options::getOptions)
+                .map(map -> map.get(value))
+                .forEach(set -> set.remove(coordinate));
+
+        boxOptions
+                .get(grid
+                        .getBox(grid.getCell(coordinate))
+                        .getCoordinate())
+                .getOptions()
+                .get(value)
+                .remove(coordinate);
 
 
+        LOG.debug("round {} deleting option: location={}, option={}", round, PrettyPrint.toString(coordinate),
+                value);
     }
 
     public boolean isComplete() {
