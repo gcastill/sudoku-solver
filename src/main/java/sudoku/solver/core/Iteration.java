@@ -35,10 +35,14 @@ public class Iteration {
                         .getValue()
                         .size() == 1)
                 .peek(e -> {
+
                     Coordinate coordinate = e.getKey();
-                    clone.setValue(coordinate.getX(), coordinate.getY(), e
+                    Integer option = e
                             .getValue()
-                            .first());
+                            .first();
+                    LOG.debug("{} has only one option so setting it to {}", PrettyPrint.toString(coordinate), option);
+
+                    clone.setValue(coordinate.getX(), coordinate.getY(), option);
                 })
                 .count();
 
@@ -56,7 +60,7 @@ public class Iteration {
                 .sum();
 
 
-        if (updateCount == 0) {
+        if (updateCount == 0 && round != 0) {
             return null;
         }
         return new Iteration(round + 1, clone);
@@ -88,17 +92,18 @@ public class Iteration {
                 });
 
 
-        long nakedSetsCount = NakedSets.analyze(this);
-        long omissionCount = Omission.analyze(this);
-        long xWingCount = XWing.analyze(this);
-        long hiddenSetsCount = HiddenSets.analyze(this);
+        if (round != -0) {
+            long nakedSetsCount = NakedSets.analyze(this);
+            long omissionCount = Omission.analyze(this);
+            long xWingCount = XWing.analyze(this);
+            long hiddenSetsCount = HiddenSets.analyze(this);
 
 
-        LOG.debug("nakedSetsCount={}, omissionCount={}, xWingCount={}, hiddenSetsCount={}", nakedSetsCount,
-                omissionCount,
-                xWingCount, hiddenSetsCount);
-   
+            LOG.debug("nakedSetsCount={}, omissionCount={}, xWingCount={}, hiddenSetsCount={}", nakedSetsCount,
+                    omissionCount,
+                    xWingCount, hiddenSetsCount);
 
+        }
     }
 
     public void removeOption(Coordinate coordinate, int value) {
@@ -170,6 +175,16 @@ public class Iteration {
                     .filter(e -> e
                             .getValue()
                             .size() == 1)
+                    .filter(e -> clone
+                            .getCell(e
+                                    .getValue()
+                                    .first())
+                            .requiresSolving())
+                    .peek(e -> LOG.debug("in {}, {} can only be placed in coordinate so setting marking {} to that " +
+                                    "value",
+                            getId(), e.getKey(), PrettyPrint.toString(e
+                                    .getValue()
+                                    .first())))
                     .collect(Collectors.toMap(e -> e
                             .getValue()
                             .first(), Map.Entry::getKey));
