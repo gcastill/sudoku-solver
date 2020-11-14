@@ -97,7 +97,7 @@ public class XWing {
             }
             TreeSet<LineAddress> pairLineAddresses = oppositeIndicesToLineAddress.get(entry.getValue());
             LineAddress lineAddress = entry.getKey();
-            LOG.trace("xWing option={} {}", 2, entry);
+            LOG.trace("xWing option={} {}", option, entry);
             SortedSet<Coordinate> coordinates =
                     pairLineAddresses
                             .stream()
@@ -109,7 +109,8 @@ public class XWing {
                     .stream()
                     .map(orientation.opposite()::lineAddressFor)
                     .collect(Collectors.toCollection(TreeSet::new));
-            LOG.trace("xWing option={}, lineAddress={}, coordinates={} oppositeLines={}", 2, lineAddress, coordinates,
+            LOG.trace("xWing option={}, lineAddress={}, coordinates={} oppositeLines={}", option, lineAddress,
+                    coordinates,
                     oppositeLineAddresses);
 
             for (LineAddress oppositeLineAddress : oppositeLineAddresses) {
@@ -123,7 +124,7 @@ public class XWing {
                         .filter(c -> !coordinates.contains(c))
                         .collect(Collectors.toSet());
                 if (!toDelete.isEmpty()) {
-                    LOG.debug("xWing option={}, lineAddress={}, coordinates={} oppositeLines={}, toDelete={}", 2,
+                    LOG.debug("xWing option={}, lineAddress={}, coordinates={} oppositeLines={}, toDelete={}", option,
                             lineAddress, coordinates,
                             oppositeLineAddresses, toDelete);
                 }

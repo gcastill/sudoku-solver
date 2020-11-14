@@ -24,15 +24,20 @@ public class CsvLoader {
                         .strip();
                 char[] chars = line.toCharArray();
                 for (char character : chars) {
-                    if (character != ',') {
-                        result.setValue(x, y, Integer.parseInt("" + character));
-                    }else {
-                        x++;
+                    switch (character) {
+                        case ',':
+                            x++;
+                            break;
+                        case '*':
+                            break;
+                        default:
+                            result.setValue(x, y, Integer.parseInt("" + character));
+                            break;
                     }
 
                 }
 
-                            }
+            }
 
 
             return result;

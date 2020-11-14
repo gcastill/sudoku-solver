@@ -1,0 +1,117 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="'Iteration '+   ${iteration.round}"></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
+    <style>
+.solved
+{
+  font-size: 150%;
+
+}
+.option
+{
+    font-size: 50%;
+    color: black;
+}
+
+td.main-td {
+  border-collapse: collapse;
+  border: 1px solid black;
+}
+
+table.main-table {
+  border-collapse: collapse;
+  border: 1px solid black;
+  text-align: center;
+  width: 568px;
+  table-layout: fixed;
+}
+table.option-table {
+     height: 100%;
+     width: 100%;
+     table-layout: fixed;
+
+}
+
+table.option-table tbody tr td {
+   width: 33%;
+   height: 20px;
+}
+
+div.option-div {
+  overflow: hidden;
+  height: 100%;
+}
+
+tr.main-tr-3,tr.main-tr-6 {
+  border-bottom: 4px solid black;
+}
+
+td.main-td-3,td.main-td-6 {
+  border-left: 4px solid black;
+}
+
+
+
+</style>
+
+</head>
+<body>
+<table class="main-table">
+    <tbody>
+    <tr  th:each="y: ${#numbers.sequence(8,0, -1)}" th:class="'main-tr main-tr-' + ${y}" >
+        <td th:each="x: ${#numbers.sequence(0,8)}" th:class="'main-td main-td-' + ${x}">
+             <span th:with="cell=${iteration.grid.getCell(x,y)}">
+                 <span th:if="${cell.isComplete()}" th:text="${cell.value}" class="solved"></span>
+                 <div th:unless="${cell.isComplete()}" class="option-div">
+                     <table
+                             th:with="options=${iteration.coordinateOptions.get(iteration.grid.getCell(x,y).getCoordinate())}" class="option-table">
+                         <tbody>
+                         <tr>
+                             <td><span th:if="${options.contains(1)}" class="option">1</span></td>
+                             <td><span th:if="${options.contains(2)}" class="option">2</span></td>
+                             <td><span th:if="${options.contains(3)}" class="option">3</span></td>
+                         </tr>
+                         <tr>
+                             <td><span th:if="${options.contains(4)}" class="option">4</span></td>
+                             <td><span th:if="${options.contains(5)}" class="option">5</span></td>
+                             <td><span th:if="${options.contains(6)}" class="option">6</span></td>
+                         </tr>
+                         <tr>
+                             <td><span th:if="${options.contains(7)}" class="option">7</span></td>
+                             <td><span th:if="${options.contains(8)}" class="option">8</span></td>
+                             <td><span th:if="${options.contains(9)}" class="option">9</span></td>
+                         </tr>
+
+
+                         </tbody>
+
+                     </table>
+
+
+                 </div>
+             </span>
+        </td>
+    </tr>
+    </tbody>
+
+
+</table>
+<ul>
+    <li th:if="${iteration.round == 0}">First</li>
+    <li th:unless="${iteration.round == 0}"><a th:href="'iteration-0.html'">First</a></li>
+    <li th:if="${iteration.round == 0}">Previous</li>
+    <li th:unless="${iteration.round == 0}"><a th:href="'iteration-' + ${iteration.round - 1} + '.html'">Previous</a></li>
+    <li th:if="${iteration.round == maxIteration}">Next</li>
+    <li th:unless="${iteration.round == maxIteration}"><a th:href="'iteration-' + ${iteration.round + 1} + '.html'">
+        Next</a></li>
+    <li th:if="${iteration.round == maxIteration}">Last</li>
+    <li th:unless="${iteration.round == maxIteration}"><a th:href="'iteration-' + ${maxIteration} + '.html'">
+        Last</a></li>
+</ul>
+
+
+</body>
+</html>

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import sudoku.solver.core.rule.HiddenSets;
+import sudoku.solver.core.rule.NakedSets;
 import sudoku.solver.core.rule.Omission;
 import sudoku.solver.core.rule.XWing;
 import sudoku.solver.util.PrettyPrint;
@@ -86,16 +87,17 @@ public class Iteration {
                     lineOptions.put(o.getId(), o);
                 });
 
-        long updateCount = -1;
-        while (updateCount != 0) {
-            long hiddenSetsCount = HiddenSets.analyze(this);
-            long omissionCount = Omission.analyze(this);
-            long xWingCount = XWing.analyze(this);
 
-            updateCount = hiddenSetsCount + omissionCount + xWingCount;
-            LOG.debug("hiddenSetsCount={}, omissionCount={}, xWingCount={}", hiddenSetsCount, omissionCount, xWingCount);
-        }
+        long nakedSetsCount = NakedSets.analyze(this);
+        long omissionCount = Omission.analyze(this);
+        long xWingCount = XWing.analyze(this);
+        long hiddenSetsCount = HiddenSets.analyze(this);
 
+
+        LOG.debug("nakedSetsCount={}, omissionCount={}, xWingCount={}, hiddenSetsCount={}", nakedSetsCount,
+                omissionCount,
+                xWingCount, hiddenSetsCount);
+   
 
     }
 
@@ -128,6 +130,10 @@ public class Iteration {
 
     public boolean isComplete() {
         return grid.isComplete();
+    }
+
+    public boolean isValid() {
+        return grid.isValid();
     }
 
     @Value

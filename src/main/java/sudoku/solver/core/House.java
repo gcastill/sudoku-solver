@@ -35,4 +35,16 @@ public interface House {
         return !isComplete();
     }
 
+
+    default boolean isValid() {
+        Set<Integer> values = IntStream
+                .range(1, 10)
+                .boxed()
+                .collect(Collectors.toSet());
+
+        return getCellValues()
+                .stream()
+                .allMatch(values::remove);
+    }
+
 }

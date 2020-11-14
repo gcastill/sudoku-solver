@@ -3,7 +3,9 @@ package sudoku.solver.util;
 import sudoku.solver.core.Coordinate;
 import sudoku.solver.core.Grid;
 
+import java.util.Collection;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class PrettyPrint {
 
@@ -48,6 +50,16 @@ public class PrettyPrint {
 
     public static String toString(Coordinate coordinate) {
         return "(" + coordinate.getX() + "," + coordinate.getY() + ")";
+    }
+
+
+
+    public static String toCoordinateCollectionString(Collection<Coordinate> coordinateCollection) {
+        return coordinateCollection
+                .stream()
+                .map(PrettyPrint::toString)
+                .collect(Collectors.toList())
+                .toString();
     }
 
 }

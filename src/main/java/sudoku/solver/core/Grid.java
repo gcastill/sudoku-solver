@@ -151,9 +151,14 @@ public class Grid {
                 .stream();
     }
 
+
     public boolean isComplete() {
         return cellStream()
-                .allMatch(Cell::isComplete)
-                ;
+                .allMatch(Cell::isComplete);
+
     }
+    public boolean isValid() {
+        return lineStream().allMatch(House::isValid) && boxStream().allMatch(House::isValid);
+    }
+
 }

@@ -1,13 +1,18 @@
 package sudoku.solver.core;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sudoku.solver.util.CsvLoader;
 import sudoku.solver.util.PrettyPrint;
+import sudoku.solver.util.HtmlWriter;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 class SolverTest {
 
@@ -83,98 +88,63 @@ class SolverTest {
     }
 
     @Test
-    void testSolve20191307Hard() {
-        Grid g = CsvLoader.load("csv/20191307-hard.csv");
+    void testSolve20190713Hard() {
+        Grid g = CsvLoader.load("csv/20190713-hard.csv");
         testSolve(g);
     }
 
     @Test
-    void testSolve20191507Evil() {
-        Grid g = CsvLoader.load("csv/20191507-evil.csv");
+    void testSolve20190715Evil() {
+        Grid g = CsvLoader.load("csv/20190715-evil.csv");
+        testSolve(g);
+    }
+
+    @Test
+    void testSolve20191016Hard() {
+        Grid g = CsvLoader.load("csv/20191026-hard.csv");
+        testSolve(g);
+    }
+
+    @Test
+    void testSolve20191028Evil() {
+        Grid g = CsvLoader.load("csv/20191028-evil.csv");
+        testSolve(g);
+    }
+
+
+    @Test
+    void testSolve20190812Evil() {
+        Grid g = CsvLoader.load("csv/20190812-evil.csv");
         testSolve(g);
     }
 
 
     public void testSolve(Grid g) {
+        try {
+            List<Iteration> iterations = Solver.solve(g);
+            for (Iteration i : iterations) {
 
-        List<Iteration> iterations = Solver.solve(g);
-        for (Iteration i : iterations) {
-            System.out.println(PrettyPrint.toString(i.getGrid()));
-            i
-                    .getCoordinateOptions()
-                    .entrySet()
-                    .stream()
-//                    .filter(e -> e
-//                            .getValue()
-//                            .size() == 1)
-                    .forEach(e -> System.out.printf("%s, options=%s\n", PrettyPrint.toString(e
-                            .getKey()), e.getValue()));
-            System.out.println();
-
-
-            i
-                    .getBoxOptions()
-                    .entrySet()
-                    .forEach(e ->
-                            {
-                                String header =
-                                String.format("Box%s", PrettyPrint.toString(e.getKey()));
-                                e
-                                        .getValue()
-                                        .getOptions()
-                                        .entrySet()
-                                        .stream()
-//                                        .filter(entry -> entry
-//                                                .getValue()
-//                                                .size() == 1)
-                                        .forEach(entry -> System.out.printf("%s, value=%s, options=%s\n",
-                                                header,
-                                                entry.getKey(),
-                                                entry
-                                                        .getValue()
-                                                        .stream()
-                                                        .map(PrettyPrint::toString)
-                                                        .collect(Collectors.toList())));
-                            }
-                    );
-            System.out.println();
-
-            i
-                    .getLineOptions()
-                    .entrySet()
-                    .forEach(e ->
-                            {
-                                String header =
-                                String.format("Line(%s,%s)", e
-                                        .getKey()
-                                        .getOrientation(), e
-                                        .getKey()
-                                        .getIndex());
-                                e
-                                        .getValue()
-                                        .getOptions()
-                                        .entrySet()
-                                        .stream()
-//                                        .filter(entry -> entry
-//                                                .getValue()
-//                                                .size() == 1)
-                                        .forEach(entry -> System.out.printf("%s, value=%s, options=%s\n",
-                                                header,
-                                                entry.getKey(),
-                                                entry
-                                                        .getValue()
-                                                        .stream()
-                                                        .map(PrettyPrint::toString)
-                                                        .collect(Collectors.toList())));
-                            }
-                    );
-            System.out.println();
-
+                generateHtml(i, iterations.size()-1);
+                Assertions.assertTrue(i.isValid());
+            }
+            Iteration last = iterations
+                    .get(iterations.size() - 1);
+            System.out.printf("finished after %s iterations, isComplete= %s\n", iterations.size(),last.isComplete());
+            Assertions.assertTrue(last.isComplete());
+        } catch (Exception e) {
+            System.out.println(PrettyPrint.toString(g));
+            throw e;
 
         }
-        System.out.printf("finished after %s iterations, isComplete= %s\n", iterations.size(),
-                iterations
-                        .get(iterations.size() - 1)
-                        .isComplete());
+    }
+
+    private void generateHtml(Iteration i, int maxIteration) {
+        String html = HtmlWriter.processHMTLTemplate("iteration", i,maxIteration);
+        try {
+            Files.writeString(new File("build/iteration-" + i.getRound() + ".html").toPath(), html);
+        } catch (IOException ioe) {
+            throw new UncheckedIOException(ioe);
+        }
+
     }
 }

@@ -1,12 +1,15 @@
 package sudoku.solver.core.rule;
 
+import lombok.extern.slf4j.Slf4j;
 import sudoku.solver.core.*;
+import sudoku.solver.util.PrettyPrint;
 
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class Omission {
 
     public static long analyze(Iteration iteration) {
@@ -35,12 +38,8 @@ public class Omission {
                 .stream()
                 .mapToLong(e -> {
                     int updates = 0;
-                    updates += analyzeBoxOption(iteration, options, e.getKey(), e.getValue(), c -> iteration
-                            .getGrid()
-                            .getHorizontalLine(c));
-                    updates += analyzeBoxOption(iteration, options, e.getKey(), e.getValue(), c -> iteration
-                            .getGrid()
-                            .getVerticalLine(c));
+                    updates += analyzeBoxOption(iteration, options, e.getKey(), e.getValue(), Orientation.VERTICAL);
+                    updates += analyzeBoxOption(iteration, options, e.getKey(), e.getValue(), Orientation.HORIZONTAL);
                     return updates;
                 })
                 .sum();
@@ -57,11 +56,13 @@ public class Omission {
 
 
     public static long analyzeBoxOption(Iteration iteration, Iteration.Options<Coordinate> options, Integer option,
-                                        SortedSet<Coordinate> coordinates, Function<Coordinate, Line> lineLookup) {
+                                        SortedSet<Coordinate> coordinates, Orientation orientation) {
 
         Set<Line> lines = coordinates
                 .stream()
-                .map(lineLookup)
+                .map(c -> iteration
+                        .getGrid()
+                        .getLine(c, orientation))
                 .collect(Collectors.toSet());
 
 
@@ -83,6 +84,11 @@ public class Omission {
                             .getOptions()
                             .get(option)
                             .contains(coordinate))
+                    .peek(coordinate -> LOG.debug("box={}, orientation={}, remove={}, option={}",
+                            options.getId(),
+                            orientation,
+                            PrettyPrint.toString(coordinate),
+                            option))
                     .peek(coordinate -> iteration.removeOption(coordinate, option))
                     .count();
         }
@@ -116,6 +122,11 @@ public class Omission {
                             .getOptions()
                             .get(option)
                             .contains(coordinate))
+                    .peek(coordinate -> LOG.debug("line={}, box={}, remove={}, option={}",
+                            options.getId(),
+                            box.getCoordinate(),
+                            PrettyPrint.toString(coordinate),
+                            option))
                     .peek(coordinate -> iteration.removeOption(coordinate, option))
                     .count();
         }
