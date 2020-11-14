@@ -4,8 +4,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sudoku.solver.util.CsvLoader;
-import sudoku.solver.util.PrettyPrint;
 import sudoku.solver.util.HtmlWriter;
+import sudoku.solver.util.PrettyPrint;
 
 import java.io.File;
 import java.io.IOException;
@@ -83,11 +83,6 @@ class SolverTest {
 
 
     @Test
-    void testSolve() {
-
-    }
-
-    @Test
     void testSolve20190713Hard() {
         Grid g = CsvLoader.load("csv/20190713-hard.csv");
         testSolve(g);
@@ -120,16 +115,17 @@ class SolverTest {
 
 
     public void testSolve(Grid g) {
+    
         try {
             List<Iteration> iterations = Solver.solve(g);
             for (Iteration i : iterations) {
 
-                generateHtml(i, iterations.size()-1);
+                generateHtml(i, iterations.size() - 1);
                 Assertions.assertTrue(i.isValid());
             }
             Iteration last = iterations
                     .get(iterations.size() - 1);
-            System.out.printf("finished after %s iterations, isComplete= %s\n", iterations.size(),last.isComplete());
+            System.out.printf("finished after %s iterations, isComplete= %s\n", iterations.size(), last.isComplete());
             Assertions.assertTrue(last.isComplete());
         } catch (Exception e) {
             System.out.println(PrettyPrint.toString(g));
@@ -139,7 +135,7 @@ class SolverTest {
     }
 
     private void generateHtml(Iteration i, int maxIteration) {
-        String html = HtmlWriter.processHMTLTemplate("iteration", i,maxIteration);
+        String html = HtmlWriter.processHMTLTemplate("iteration", i, maxIteration);
         try {
             Files.writeString(new File("build/iteration-" + i.getRound() + ".html").toPath(), html);
         } catch (IOException ioe) {

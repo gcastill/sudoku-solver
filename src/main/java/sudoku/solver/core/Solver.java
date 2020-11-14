@@ -1,20 +1,41 @@
 package sudoku.solver.core;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class Solver {
 
+
+    public static Stream<Grid> solveBruteForce(Grid grid) {
+        if (grid.isComplete()) {
+
+            return Stream.of(grid);
+        }
+        Cell cell = grid
+                .cellStream()
+                .filter(Cell::requiresSolving)
+                .findFirst()
+                .get();
+
+        return IntStream
+                .range(1, 10)
+                .mapToObj(value -> {
+                    Grid clone = grid.clone();
+                    clone.setValue(cell.getCoordinate(), value);
+                    return clone;
+                })
+                .filter(Grid::isValid)
+                .flatMap(Solver::solveBruteForce);
+
+    }
 
     public static List<Iteration> solve(Grid grid) {
 
 
         List<Iteration> iterations = new ArrayList<>();
-        Iteration last = new Iteration(0,grid);
+        Iteration last = new Iteration(0, grid);
         iterations.add(last);
         while (!last.isComplete()) {
             last.analyze();
