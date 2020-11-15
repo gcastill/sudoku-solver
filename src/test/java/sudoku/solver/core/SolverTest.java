@@ -115,7 +115,14 @@ class SolverTest {
 
 
     public void testSolve(Grid g) {
-    
+        testSolve(g, 1);
+    }
+
+    public void testSolve(Grid g, int possibleSolutions) {
+//        List<Grid> solutions = Solver
+//                .solveBruteForce(g)
+//                .collect(Collectors.toList());
+//        Assertions.assertEquals(possibleSolutions, solutions.size());
         try {
             List<Iteration> iterations = Solver.solve(g);
             for (Iteration i : iterations) {

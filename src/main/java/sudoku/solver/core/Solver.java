@@ -18,15 +18,26 @@ public class Solver {
                 .filter(Cell::requiresSolving)
                 .findFirst()
                 .get();
-
         return IntStream
                 .range(1, 10)
+                .parallel()
                 .mapToObj(value -> {
                     Grid clone = grid.clone();
                     clone.setValue(cell.getCoordinate(), value);
-                    return clone;
+
+                    if (clone
+                            .getHorizontalLine(cell)
+                            .isValid() && clone
+                            .getVerticalLine(cell)
+                            .isValid() && clone
+                            .getBox(cell)
+                            .isValid()) {
+                        return clone;
+                    }
+
+                    return null;
                 })
-                .filter(Grid::isValid)
+                .filter(Objects::nonNull)
                 .flatMap(Solver::solveBruteForce);
 
     }
